@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.ttk import *
 from datetime import datetime
 import tkinter.messagebox
 import openpyxl
@@ -30,10 +31,39 @@ class Taepung():
         members.save(r'%s'%path)
         name.delete(0,END)
         
+        
     def helpbar(self):
-            new=NewUser()
-    
+        new=NewUser()
+        
+    def reseach(self):
+        treeview=tkinter.ttk.Treeview(app, columns=["one", "two"], displaycolumns=[ "one","two"],height=50)
+        treeview.grid(row=2,column=1)
+        
+        treeview.column("#0", width=100)
+        treeview.heading("#0", text="번호")
+        
+        treeview.column("#1", width=100)
+        treeview.heading("two", text="출결")
+
+        treeview.column("#2", width=100)
+        treeview.heading("one", text="이름")
+        
+        namelist = "출석현황.xlsx"
+        members = openpyxl.load_workbook(namelist)
+        members_sheet = members['%s월'%self.month]
+        i=3
+        treelist=[]
+        while i<50:
+            #(members_sheet.cell(i,1).value)
+            treelist.append([(members_sheet.cell(i,2).value),(members_sheet.cell(i,self.day+2).value)])
+            i=i+1
+        for a in range(len(treelist)):
+            treeview.insert('','end',text=a,values=treelist[a])
+        members.close()
+
+        
     def __init__(self):
+        global app
         app=Tk()
         app.title("출석 체크")
 
@@ -54,8 +84,12 @@ class Taepung():
         name.grid(row=1,column=1)
 
         Button(app,text="출석",width='10',command=self.find).grid(row=1,column=2)
+        Button(app,text="새로고침",width='10',command=self.reseach).grid(row=0,column=2)
+
         
-                
+        
+        
+        
         app.mainloop()
 
 
@@ -79,6 +113,8 @@ class NewUser():
         add=openpyxl.load_workbook("회원연락처.xlsx")
         add_sheet=add['회원연락처']
         name_all = add_sheet['A']
+        
+        global data
         data=[]
         for cell in name_all:
             data.append(cell.value)
@@ -91,13 +127,14 @@ class NewUser():
             i=i+1
             row=row+1
         attendnce.save(r'%s'%path)
-            
+        tkinter.messagebox.showinfo("완료","새로고침완료")
+        
     def __init__(self):
         app2=Tk()
         app2.title("회원가입")
         app2.geometry('320x100+1000+600')
         
-        Label(app2,text=" 신규회원 등록 ",width=10,font=(25)).grid(row=0,column=1)
+        Label(app2,text="신규회원 등록",width=15,font=(25)).grid(row=0,column=1)
         for c in self.info:
             Label(app2,text=c,width=10,font=(25)).grid(row=self.a,column=0)
             self.a=self.a+1
@@ -115,7 +152,8 @@ class NewUser():
         address.grid(row=3,column=1)
 
         Button(app2,text="저장",width='10',command=self.save).grid(row=1,column=2)
-        Button(app2,text="새로고침",width='10', command=self.update).grid(row=2,column=2,padx=5)
+        Button(app2,text="추가",width='10', command=self.update).grid(row=2,column=2,padx=5)
+
         
         
 play=Taepung()
