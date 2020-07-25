@@ -36,9 +36,17 @@ class Taepung():
         new=NewUser()
         
     def reseach(self):
-        treeview=tkinter.ttk.Treeview(app, columns=["one", "two"], displaycolumns=[ "one","two"],height=50)
-        treeview.grid(row=2,column=1)
+        frame = Frame(app)
+        frame.grid(row=2,column=1)
         
+        treeview=tkinter.ttk.Treeview(frame, columns=["one", "two"], displaycolumns=[ "one","two"],height=31)
+        treeview.pack(side="left")
+
+        vsb = tkinter.Scrollbar(frame, orient="vertical", command=treeview.yview)
+        vsb.pack(side='right', fill='y')
+
+        treeview.configure(yscrollcommand=vsb.set)
+
         treeview.column("#0", width=100)
         treeview.heading("#0", text="번호")
         
@@ -49,11 +57,13 @@ class Taepung():
         treeview.heading("one", text="이름")
         
         namelist = "출석현황.xlsx"
+        
         members = openpyxl.load_workbook(namelist)
         members_sheet = members['%s월'%self.month]
+        
         i=3
         treelist=[]
-        while i<50:
+        while i<200:
             #(members_sheet.cell(i,1).value)
             treelist.append([(members_sheet.cell(i,2).value),(members_sheet.cell(i,self.day+2).value)])
             i=i+1
@@ -107,6 +117,9 @@ class NewUser():
         add_sheet.append([new_name.get(),phonenum.get(),address.get()])
         add.save(r'%s'%path)
         tkinter.messagebox.showinfo("완료",new_name.get()+self.success)
+        new_name.delete(0,END)
+        phonenum.delete(0,END)
+        address.delete(0,END)
         
     def update(self):
         path=os.path.abspath('출석현황.xlsx')
@@ -132,7 +145,7 @@ class NewUser():
     def __init__(self):
         app2=Tk()
         app2.title("회원가입")
-        app2.geometry('320x100+1000+600')
+        app2.geometry('400x130+1000+600')
         
         Label(app2,text="신규회원 등록",width=15,font=(25)).grid(row=0,column=1)
         for c in self.info:
